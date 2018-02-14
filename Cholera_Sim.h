@@ -10,6 +10,10 @@
 
 using namespace std;
 
+const vector<double> RAIN = {(267.029+45.824+30.495), 26.68579, 169.00367, 275.74283, 418.06171, 91.20199, 140.94853, 140.94853, 456.00995, 39.24, 98.1, 215.82, 307.38, 18.086, 280.333, 253.204, 352.677, 39.537, 237.222, 263.58, 777.561, 68.464, 136.928, 179.718, 470.69, 11.488, 183.808, 333.152, 620.352, 164.065, 94.985, 198.605, 405.845, 30.348, 106.218, 227.61, 394.524, 10.091, 171.547, 272.457, 544.914, 40.552, 172.346, 263.588, 537.314, 16.198, 121.485, 251.069, 421.148, 110.964, 206.076, 467.634, 515.19, 13.714, 143.997, 198.853, 322.279};
+
+const vector<double> MEAN_RAIN = {74.892,8.407,14.214,28.9,46.386,76.279,43.7,60.8,94.15,102.729,207.964,196.021};//assuming rainfall starts in december (one month delay)
+
 class Cholera_Sim : public DiffEq_Sim {
 
     private:
@@ -38,20 +42,13 @@ class Cholera_Sim : public DiffEq_Sim {
         }
     
     double getRain(double t){
-        array<double,57> rain = {(267.029+45.824+30.495), 26.68579, 169.00367, 275.74283, 418.06171, 91.20199, 140.94853, 140.94853, 456.00995, 39.24, 98.1, 215.82, 307.38, 18.086, 280.333, 253.204, 352.677, 39.537, 237.222, 263.58, 777.561, 68.464, 136.928, 179.718, 470.69, 11.488, 183.808, 333.152, 620.352, 164.065, 94.985, 198.605, 405.845, 30.348, 106.218, 227.61, 394.524, 10.091, 171.547, 272.457, 544.914, 40.552, 172.346, 263.588, 537.314, 16.198, 121.485, 251.069, 421.148, 110.964, 206.076, 467.634, 515.19, 13.714, 143.997, 198.853, 322.279};
-        
-        if((int)floor(t)%3 and !(int)floor(prevTime)%3){
-            vecCounter++;
-        }
-        prevTime = t;
-        return rain[vecCounter]/3.0;//rainfall given for three month time increments -- converting to monthly
+        int rain_idx = (int) (t/3);
+        return RAIN[rain_idx]/3.0;//rainfall given for three month time increments -- converting to monthly
     }
     
     double getDelta(double t){
         double modTime = (int)floor(t)%12;
-        array<double,12> meanRain = {74.892,8.407,14.214,28.9,46.386,76.279,43.7,60.8,94.15,102.729,207.964,196.021};//assuming rainfall starts in december (one month delay)
-        
-        return meanRain[modTime];
+        return MEAN_RAIN[modTime];
     }
 
         void derivative(double const x[], double dxdt[]) {
@@ -61,7 +58,8 @@ class Cholera_Sim : public DiffEq_Sim {
             const double R = x[3];
             const double N = S+I+Y+R;
             const double _t = get_time();
-            double waterTerm = getRain(_t)/(getRain(_t)+getDelta(_t));
+            const double rain = getRain(_t);
+            const double waterTerm = rain/(rain+getDelta(_t));
 
             dxdt[0] = (b*N) - waterTerm*(beta*S*(I+Y)/N) - (mu*S) + (rho*Y) + (epsilon*R);
             dxdt[1] = (waterTerm*C*beta*S*(I+Y)/N) - (gamma*I) - (mu*I);

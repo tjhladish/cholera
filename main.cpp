@@ -23,6 +23,10 @@ int main() {
     for (int i = 0; i < max_time; ++i) {
         sim.printX();
         sim.step_simulation(1);
+        const double rain = sim.getRain(i);
+        const double waterTerm = rain/(rain+sim.getDelta(i));
+
+        cerr << waterTerm << endl;
     }
     sim.printX();
 
