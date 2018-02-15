@@ -17,6 +17,8 @@ int main() {
 
     Cholera_Sim sim(b, beta, C, epsilon, gamma, mu, rho);
     sim.initialize(S, I, Y, R);
+    
+    sim.readRain(); //read in rain from txt file
 
     const int max_time   = 168;
 
@@ -28,7 +30,7 @@ int main() {
 
         cerr << waterTerm << endl;
     }
-    sim.printX();
+    //sim.printX();
 
     //sim.run_simulation();
 
