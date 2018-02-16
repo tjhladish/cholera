@@ -39,7 +39,12 @@ class DiffEq_Sim {
 
         ~DiffEq_Sim() {};
 
-        void printX() { for(unsigned int i=0; i < nbins-1; i++) { cout << x[i] << " ";} cout << x[nbins-1] << endl; }
+        void printX() {
+            for(unsigned int i=0; i < nbins-1; i++) {
+                cout << x[i] << " ";
+            }
+            cout << x[nbins-1] << endl;
+        }
 
         vector<double> get_state() {
             vector<double> C;
@@ -48,6 +53,8 @@ class DiffEq_Sim {
         }
 
         inline double get_time() { return t; }
+    
+        inline void reset_time(){ t = 0;}
 
 
         virtual void initialize() {}
