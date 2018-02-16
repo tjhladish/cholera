@@ -18,7 +18,7 @@ using namespace std;
 vector<double> RAIN;
 
 
-const vector<double> MEAN_RAIN = {74.892,8.407,14.214,28.9,46.386,76.279,43.7,60.8,94.15,102.729,207.964,196.021};//assuming rainfall starts in december (one month delay)
+//const vector<double> MEAN_RAIN = {8.407,14.214,28.9,46.386,76.279,43.7,60.8,94.15,102.729,207.964,196.021,74.892};//assuming rainfall starts in January
 
 class Cholera_Sim : public DiffEq_Sim {
 
@@ -30,13 +30,13 @@ class Cholera_Sim : public DiffEq_Sim {
         const double gamma;
         const double mu;
         const double rho;
-        double vecCounter = 0;
-        double prevTime = 0;
+        const double perturbation;
+        double meanRain;
 
     public:
-        Cholera_Sim() : b(0.0), beta(0.0), C(0.0), epsilon(0.0), gamma(0.0), mu(0.0), rho(0.0) { nbins=4; }
-        Cholera_Sim(double _b, double _beta, double _C, double _epsilon, double _gamma, double _mu, double _rho): 
-                    b(_b), beta(_beta), C(_C), epsilon(_epsilon), gamma(_gamma), mu(_mu), rho(_rho) { nbins=4; }
+        Cholera_Sim() : b(0.0), beta(0.0), C(0.0), epsilon(0.0), gamma(0.0), mu(0.0), rho(0.0), perturbation(0.0) { nbins=4; }
+        Cholera_Sim(double _b, double _beta, double _C, double _epsilon, double _gamma, double _mu, double _rho, double _perturbation):
+                    b(_b), beta(_beta), C(_C), epsilon(_epsilon), gamma(_gamma), mu(_mu), rho(_rho), perturbation(_perturbation) { nbins=4; }
         ~Cholera_Sim() {};
 
         void initialize(double S, double I, double Y, double R) {
@@ -47,16 +47,27 @@ class Cholera_Sim : public DiffEq_Sim {
             x[3] = R;
         }
     
-    void readRain(){
+    vector<double> getCompartment(){
+        vector<double> comp;
+        for(int i = 0; i < nbins - 1; i++){
+            comp.push_back(x[i]);
+        }
+        return comp;
+    }
+    
+    double readRain(){
+        double sumRain = 0.0;
         if(ifstream in {"Vellore_monthly_rainfall.txt"}){
             double rain;
             while(in >> rain){
                 RAIN.push_back(rain);
+                sumRain+=rain;
             }
         }
         else{
             
         }
+        return meanRain = sumRain/RAIN.size();
     }
     
     double getRain(double t){
@@ -64,10 +75,6 @@ class Cholera_Sim : public DiffEq_Sim {
         return RAIN[rain_idx];
     }
     
-    double getDelta(double t){
-        double modTime = (int)floor(t)%12;
-        return MEAN_RAIN[modTime];
-    }
 
         void derivative(double const x[], double dxdt[]) {
             const double S = x[0];
@@ -77,7 +84,7 @@ class Cholera_Sim : public DiffEq_Sim {
             const double N = S+I+Y+R;
             const double _t = get_time();
             const double rain = getRain(_t);
-            const double waterTerm = rain/(rain+getDelta(_t));
+            const double waterTerm = meanRain/(rain+perturbation);
 
             dxdt[0] = (b*N) - waterTerm*(beta*S*(I+Y)/N) - (mu*S) + (rho*Y) + (epsilon*R);
             dxdt[1] = (waterTerm*C*beta*S*(I+Y)/N) - (gamma*I) - (mu*I);
