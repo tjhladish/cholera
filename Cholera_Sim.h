@@ -32,6 +32,7 @@ class Cholera_Sim : public DiffEq_Sim {
         const double rho;
         const double perturbation;
         double meanRain;
+        const double avgWeeksinMonth = 4.33;
 
     public:
         Cholera_Sim() : b(0.0), beta(0.0), C(0.0), epsilon(0.0), gamma(0.0), mu(0.0), rho(0.0), perturbation(0.0) { nbins=4; }
@@ -49,7 +50,7 @@ class Cholera_Sim : public DiffEq_Sim {
     
     vector<double> getCompartment(){
         vector<double> comp;
-        for(int i = 0; i < nbins - 1; i++){
+        for(unsigned int i = 0; i < nbins - 1; i++){
             comp.push_back(x[i]);
         }
         return comp;
@@ -75,6 +76,11 @@ class Cholera_Sim : public DiffEq_Sim {
         return RAIN[rain_idx];
     }
     
+    double getWeeklyRain(double t){
+        int rain_idx = t/avgWeeksinMonth;
+        return RAIN[rain_idx]/avgWeeksinMonth;
+    }
+    
 
         void derivative(double const x[], double dxdt[]) {
             const double S = x[0];
@@ -84,7 +90,9 @@ class Cholera_Sim : public DiffEq_Sim {
             const double N = S+I+Y+R;
             const double _t = get_time();
             const double rain = getRain(_t);
+            //const double weekly_rain = getWeeklyRain(_t); //uncomment for weekly
             const double waterTerm = meanRain/(rain+perturbation);
+            //const double waterTerm = (meanRain/avgWeeksinMonth)/(weekly_rain+perturbation); //uncomment for weekly
 
             dxdt[0] = (b*N) - waterTerm*(beta*S*(I+Y)/N) - (mu*S) + (rho*Y) + (epsilon*R);
             dxdt[1] = (waterTerm*C*beta*S*(I+Y)/N) - (gamma*I) - (mu*I);
