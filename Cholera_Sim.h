@@ -65,9 +65,6 @@ class Cholera_Sim : public DiffEq_Sim {
                 sumRain+=rain;
             }
         }
-        else{
-            
-        }
         return meanRain = sumRain/RAIN.size();
     }
     

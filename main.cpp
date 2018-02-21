@@ -1,11 +1,12 @@
 #include "AbcSmc.h"
 #include "Cholera_Sim.h"
 #include <unistd.h>
+
 vector<double> simulator(vector<double> args, const unsigned long int rng_seed, const unsigned long int serial, const ABC::MPI_par* mp) {
     const double b       = 0.02*1/12;//birth rate
-    const double beta    = atof(args[0]);//transmission rate
-    const double C       = atof(args[1]);
-    //0.0002;//prob of symptomatic infection
+    const double beta    = atof(args[0]);//10//transmission rate
+    const double C       = atof(args[1]);//0.0002;//prob of symptomatic infection
+    
     const double epsilon = 30.0/583;//waning rate from symptomatic infection
     const double gamma   = 30.0/14;//recovery rate from symptomatic infection
     const double mu      = 0.02*1/12;//death rate
