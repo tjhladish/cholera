@@ -1,8 +1,8 @@
-//#include "AbcSmc.h"
+#include "AbcSmc.h"
 #include "Cholera_Sim.h"
 #include <unistd.h>
 
-/*vector<double> simulator(vector<double> args, const unsigned long int rng_seed, const unsigned long int serial, const ABC::MPI_par* mp) {
+vector<double> simulator(vector<double> args, const unsigned long int rng_seed, const unsigned long int serial, const ABC::MPI_par* mp) {
     const double b       = 0.02*1/12;//birth rate
     const double beta    = atof(args[0]);//10//transmission rate
     const double C       = atof(args[1]);//0.0002;//prob of symptomatic infection
@@ -11,7 +11,6 @@
     const double gamma   = 30.0/14;//recovery rate from symptomatic infection
     const double mu      = 0.02*1/12;//death rate
     const double rho     = 30.0/102.2;//recovery from asymptomatic infection
-    const double perturbation = 1;//makes denominator of rain function nonzero
     
     //const double N       = 790590.0/4;
     const double S       = 33509.20478;
@@ -19,36 +18,34 @@
     const double Y       = 164119.6172;
     const double R       = 18.22614054;
     
-    Cholera_Sim sim(b, beta, C, epsilon, gamma, mu, rho, perturbation);
+    Cholera_Sim sim(b, beta, C, epsilon, gamma, mu, rho);
     sim.initialize(S, I, Y, R);
     
     const double meanRain = sim.readRain(); //read in rain from txt file and get mean of all rainfall
     //const double weeklyMeanRain = meanRain/4.33; //uncomment for weekly
     
     const int max_time   = 168;
-    //variables to initialize second simulation
-    double S_2;
-    double I_2;
-    double Y_2;
-    double R_2;
+    vector<double> metrics;
     
     //burn-in simulation -- get rid --> make rainfall vector twice as long
     for (unsigned int i = 0; i < 2*max_time; ++i) {
-        if(i == max_time){
-            sim.printX();
+        if(i == max_time - 1){
+            //sim.printX();
+            metrics = sim.getCompartment();
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
-        cerr << sim.getRain(i) << endl;
+        //cerr << sim.getRain(i) << endl;
     }
-}*/
+    return metrics;
+}
 
 void usage(){
     cout<<"\n\t Usage: Input model parameters <beta> <c>";
     exit(-1);
 }
 
-/*int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     
     if (argc!=3) usage();
     
@@ -87,9 +84,9 @@ void usage(){
     }
     
     return 0;
-}*/
+}
 
-int main() {
+/*int main() {
     const double b       = 0.02*1/12;//birth rate
     const double beta    = 10.0;//transmission rate
     const double C       = 0.0002;//prob of symptomatic infection
@@ -122,4 +119,4 @@ int main() {
 
 
     return 0;
-}
+}*/
