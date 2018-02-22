@@ -30,14 +30,13 @@ class Cholera_Sim : public DiffEq_Sim {
         const double gamma;
         const double mu;
         const double rho;
-        const double perturbation;
         double meanRain;
         const double avgWeeksinMonth = 4.33;
 
     public:
-        Cholera_Sim() : b(0.0), beta(0.0), C(0.0), epsilon(0.0), gamma(0.0), mu(0.0), rho(0.0), perturbation(0.0) { nbins=4; }
-        Cholera_Sim(double _b, double _beta, double _C, double _epsilon, double _gamma, double _mu, double _rho, double _perturbation):
-                    b(_b), beta(_beta), C(_C), epsilon(_epsilon), gamma(_gamma), mu(_mu), rho(_rho), perturbation(_perturbation) { nbins=4; }
+        Cholera_Sim() : b(0.0), beta(0.0), C(0.0), epsilon(0.0), gamma(0.0), mu(0.0), rho(0.0) { nbins=4; }
+        Cholera_Sim(double _b, double _beta, double _C, double _epsilon, double _gamma, double _mu, double _rho):
+                    b(_b), beta(_beta), C(_C), epsilon(_epsilon), gamma(_gamma), mu(_mu), rho(_rho) { nbins=4; }
         ~Cholera_Sim() {};
 
         void initialize(double S, double I, double Y, double R) {
@@ -65,6 +64,7 @@ class Cholera_Sim : public DiffEq_Sim {
                 sumRain+=rain;
             }
         }
+        RAIN.insert(RAIN.end(), RAIN.begin(), RAIN.end());
         return meanRain = sumRain/RAIN.size();
     }
     
@@ -88,7 +88,7 @@ class Cholera_Sim : public DiffEq_Sim {
             const double _t = get_time();
             const double rain = getRain(_t);
             //const double weekly_rain = getWeeklyRain(_t); //uncomment for weekly
-            const double waterTerm = meanRain/(rain+perturbation);
+            const double waterTerm = meanRain/(rain+meanRain);
             //const double waterTerm = (meanRain/avgWeeksinMonth)/(weekly_rain+perturbation); //uncomment for weekly
 
             dxdt[0] = (b*N) - waterTerm*(beta*S*(I+Y)/N) - (mu*S) + (rho*Y) + (epsilon*R);

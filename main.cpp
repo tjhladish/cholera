@@ -1,8 +1,8 @@
-#include "AbcSmc.h"
+//#include "AbcSmc.h"
 #include "Cholera_Sim.h"
 #include <unistd.h>
 
-vector<double> simulator(vector<double> args, const unsigned long int rng_seed, const unsigned long int serial, const ABC::MPI_par* mp) {
+/*vector<double> simulator(vector<double> args, const unsigned long int rng_seed, const unsigned long int serial, const ABC::MPI_par* mp) {
     const double b       = 0.02*1/12;//birth rate
     const double beta    = atof(args[0]);//10//transmission rate
     const double C       = atof(args[1]);//0.0002;//prob of symptomatic infection
@@ -32,33 +32,23 @@ vector<double> simulator(vector<double> args, const unsigned long int rng_seed, 
     double Y_2;
     double R_2;
     
-    //burn-in simulation
-    for (unsigned int i = 0; i < max_time; ++i) {
-        if(i == max_time - 1){
-            S_2 = sim.getCompartment()[0];
-            I_2 = sim.getCompartment()[1];
-            Y_2 = sim.getCompartment()[2];
-            R_2 = sim.getCompartment()[3];
+    //burn-in simulation -- get rid --> make rainfall vector twice as long
+    for (unsigned int i = 0; i < 2*max_time; ++i) {
+        if(i == max_time){
+            sim.printX();
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
-        //cerr << rain << endl;
+        cerr << sim.getRain(i) << endl;
     }
-    sim.reset_time();
-    sim.initialize(S_2,I_2,Y_2,R_2);
-    
-    for(unsigned int i = 0; i < max_time; ++i){
-        sim.printX();
-        sim.step_simulation(1);
-    }
-}
+}*/
 
 void usage(){
     cout<<"\n\t Usage: Input model parameters <beta> <c>";
     exit(-1);
 }
 
-int main(int argc, char* argv[]) {
+/*int main(int argc, char* argv[]) {
     
     if (argc!=3) usage();
     
@@ -97,9 +87,9 @@ int main(int argc, char* argv[]) {
     }
     
     return 0;
-}
+}*/
 
-/*int main() {
+int main() {
     const double b       = 0.02*1/12;//birth rate
     const double beta    = 10.0;//transmission rate
     const double C       = 0.0002;//prob of symptomatic infection
@@ -107,7 +97,6 @@ int main(int argc, char* argv[]) {
     const double gamma   = 30.0/14;//recovery rate from symptomatic infection
     const double mu      = 0.02*1/12;//death rate
     const double rho     = 30.0/102.2;//recovery from asymptomatic infection
-    const double perturbation = 1;//makes denominator of rain function nonzero
 
     //const double N       = 790590.0/4;
     const double S       = 33509.20478;
@@ -115,38 +104,22 @@ int main(int argc, char* argv[]) {
     const double Y       = 164119.6172;
     const double R       = 18.22614054;
 
-    Cholera_Sim sim(b, beta, C, epsilon, gamma, mu, rho, perturbation);
+    Cholera_Sim sim(b, beta, C, epsilon, gamma, mu, rho);
     sim.initialize(S, I, Y, R);
     
     const double meanRain = sim.readRain(); //read in rain from txt file and get mean of all rainfall
 
     const int max_time   = 168;
-    //variables to initialize second simulation
-    double S_2;
-    double I_2;
-    double Y_2;
-    double R_2;
 
-    //burn-in simulation
-    for (int i = 0; i < max_time; ++i) {
-        if(i == max_time - 1){
-            S_2 = sim.getCompartment()[0];
-            I_2 = sim.getCompartment()[1];
-            Y_2 = sim.getCompartment()[2];
-            R_2 = sim.getCompartment()[3];
+    for (unsigned int i = 0; i < 2*max_time; ++i) {
+        if(i >= max_time){
+            sim.printX();
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
-        //cerr << rain << endl;
-    }
-    sim.reset_time();
-    sim.initialize(S_2,I_2,Y_2,R_2);
-   
-    for(int i = 0; i < max_time; ++i){
-        sim.printX();
-        sim.step_simulation(1);
+        cerr << sim.getRain(i) << endl;
     }
 
 
     return 0;
-}*/
+}
