@@ -1,6 +1,7 @@
 #include "AbcSmc.h"
 #include "Cholera_Sim.h"
-#include <unistd.h>
+#include <fstream>
+#include <vector>
 
 vector<double> simulator(vector<double> args, const unsigned long int rng_seed, const unsigned long int serial, const ABC::MPI_par* mp) {
     const double b       = 0.02*1/12;//birth rate
@@ -23,15 +24,22 @@ vector<double> simulator(vector<double> args, const unsigned long int rng_seed, 
     
     const double meanRain = sim.readRain(); //read in rain from txt file and get mean of all rainfall
     //const double weeklyMeanRain = meanRain/4.33; //uncomment for weekly
+    vector <double> monthlyCases;
+    if(ifstream in {"Vellore_monthly_cases"}){
+        double cases;
+        while(in >> cases){
+            monthlyCases.push_back(cases);
+        }
+    }
     
     const int max_time   = 168;
     vector<double> metrics;
     
     //burn-in simulation -- get rid --> make rainfall vector twice as long
     for (unsigned int i = 0; i < 2*max_time; ++i) {
-        if(i == max_time - 1){
+        if(i >= max_time){
             //sim.printX();
-            metrics = sim.getCompartment();
+            metrics = sim.getCompartment()[1] - (14.0/30.0)*monthlyCases[i-168];
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
