@@ -3,10 +3,12 @@
 #include <fstream>
 #include <vector>
 
+const gsl_rng* RNG = gsl_rng_alloc(gsl_rng_taus2);
+
 vector<double> simulator(vector<double> args, const unsigned long int rng_seed, const unsigned long int serial, const ABC::MPI_par* mp) {
     const double b       = 0.02*1/12;//birth rate
-    const double beta    = atof(args[0]);//10//transmission rate
-    const double C       = atof(args[1]);//0.0002;//prob of symptomatic infection
+    const double beta    = (double)(args[0]);//10//transmission rate
+    const double C       = (double)(args[1]);//0.0002;//prob of symptomatic infection
     
     const double epsilon = 30.0/583;//waning rate from symptomatic infection
     const double gamma   = 30.0/14;//recovery rate from symptomatic infection
@@ -33,13 +35,13 @@ vector<double> simulator(vector<double> args, const unsigned long int rng_seed, 
     }
     
     const int max_time   = 168;
-    vector<double> metrics;
+    vector<double> metrics(168);
     
     //burn-in simulation -- get rid --> make rainfall vector twice as long
     for (unsigned int i = 0; i < 2*max_time; ++i) {
         if(i >= max_time){
             //sim.printX();
-            metrics = sim.getCompartment()[1] - (14.0/30.0)*monthlyCases[i-168];
+            metrics[0] = sim.getCompartment()[1] - (14.0/30.0)*monthlyCases[i-168];
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
@@ -118,11 +120,12 @@ int main(int argc, char* argv[]) {
 
     for (unsigned int i = 0; i < 2*max_time; ++i) {
         if(i >= max_time){
-            sim.printX();
+            
+            cerr<<sim.getCompartment()[1]<<endl;
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
-        cerr << sim.getRain(i) << endl;
+        //cerr << sim.getRain(i) << endl;
     }
 
 
