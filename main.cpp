@@ -27,13 +27,15 @@ vector<double> simulator(vector<double> args, const unsigned long int rng_seed, 
     const double meanRain = sim.readRain(); //read in rain from txt file and get mean of all rainfall
     //const double weeklyMeanRain = meanRain/4.33; //uncomment for weekly
     vector <double> monthlyCases;
-    if(ifstream in {"Vellore_monthly_cases"}){
-        double cases;
-        while(in >> cases){
-            monthlyCases.push_back(cases);
-        }
-    }
+    ifstream cases;
+    cases.open("Vellore_monthly_cases.txt");
+    double num;
     
+    while(cases){
+        cases >> num;
+        monthlyCases.push_back(num);
+    }
+ 
     const int max_time   = 168;
     vector<double> metrics(168);
     
@@ -41,7 +43,7 @@ vector<double> simulator(vector<double> args, const unsigned long int rng_seed, 
     for (unsigned int i = 0; i < 2*max_time; ++i) {
         if(i >= max_time){
             //sim.printX();
-            metrics[0] = sim.getCompartment()[1] - (14.0/30.0)*monthlyCases[i-168];
+            metrics[i-168] = gamma*sim.getCompartment()[1];
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
@@ -57,7 +59,7 @@ void usage(){
 
 int main(int argc, char* argv[]) {
     
-    if (argc!=3) usage();
+    if (not(argc == 3 or argc == 5 or argc == 6)) usage();
     
     vector<double> initialValues(argc-1);
     for(int i = 1; i<argc; i++){
@@ -116,12 +118,25 @@ int main(int argc, char* argv[]) {
     
     const double meanRain = sim.readRain(); //read in rain from txt file and get mean of all rainfall
 
+    vector <double> monthlyCases;
+    ifstream cases;
+    cases.open("Vellore_monthly_cases.txt");
+    double num;
+        while(cases){
+            cases >> num;
+            monthlyCases.push_back(num);
+        }
+    cout<<"length of monthly cases "<<monthlyCases.size()<<"\n";
+    for(int i = 0; i < monthlyCases.size();i++){
+        cout<<"monthly cases["<<i<<"] "<<monthlyCases[i]<<"\n";
+    }
+    
     const int max_time   = 168;
 
     for (unsigned int i = 0; i < 2*max_time; ++i) {
         if(i >= max_time){
             
-            cerr<<sim.getCompartment()[1]<<endl;
+            //cerr<<sim.getCompartment()[1]<<endl;
         }
         sim.step_simulation(1);
         //const double rain = meanRain/(sim.getRain(i)+perturbation);
