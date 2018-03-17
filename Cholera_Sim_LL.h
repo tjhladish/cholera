@@ -20,31 +20,31 @@ vector<double> RAIN;
 
 //const vector<double> MEAN_RAIN = {8.407,14.214,28.9,46.386,76.279,43.7,60.8,94.15,102.729,207.964,196.021,74.892};//assuming rainfall starts in January
 
-class Cholera_Sim : public DiffEq_Sim {
+class Cholera_Sim_LL : public DiffEq_Sim {
 
     private:
         const double b;
-        const double beta;
-        const double C;
-        const double epsilon;
-        const double gamma;
+        const double theta;
+        const double gamma_A;
+        const double gamma_S;
         const double mu;
-        const double rho;
+        const double rho_A;
+        const double rho_S;
         double meanRain;
         const double avgWeeksinMonth = 4.33;
 
     public:
-        Cholera_Sim() : b(0.0), beta(0.0), C(0.0), epsilon(0.0), gamma(0.0), mu(0.0), rho(0.0) { nbins=4; }
-        Cholera_Sim(double _b, double _beta, double _C, double _epsilon, double _gamma, double _mu, double _rho):
-                    b(_b), beta(_beta), C(_C), epsilon(_epsilon), gamma(_gamma), mu(_mu), rho(_rho) { nbins=4; }
-        ~Cholera_Sim() {};
+        Cholera_Sim_LL() : b(0.0), theta(0.0), gamma_A(0.0), gamma_S(0.0), mu(0.0), rho_A(0.0), rho_S(0.0) { nbins=4; }
+        Cholera_Sim_LL(double _b, double _theta, double _gamma_A, double _gamma_S, double _mu, double _rho_A, double _rho_S):
+                    b(_b), theta(_theta), gamma_A(_gamma_A), gamma_S(_gamma_S), mu(_mu), rho_A(_rho_A), rho_S(_rho_S) { nbins=4; }
+        ~Cholera_Sim_LL() {};
 
-        void initialize(double S, double I, double Y, double R) {
+        void initialize(double S, double I, double RA, double RS) {
             x = new double[nbins];
             x[0] = S; 
             x[1] = I; 
-            x[2] = Y;
-            x[3] = R;
+            x[2] = RA;
+            x[3] = RS;
         }
     
     vector<double> getCompartment(){
@@ -82,19 +82,20 @@ class Cholera_Sim : public DiffEq_Sim {
         void derivative(double const x[], double dxdt[]) {
             const double S = x[0];
             const double I = x[1];
-            const double Y = x[2];
-            const double R = x[3];
-            const double N = S+I+Y+R;
+            const double RA = x[2];
+            const double RS = x[3];
+            const double N = S+I+RA+RS;
             const double _t = get_time();
             const double rain = getRain(_t);
             //const double weekly_rain = getWeeklyRain(_t); //uncomment for weekly
             const double waterTerm = meanRain/(rain+meanRain);
+            const double choleraDeath = 0;
             //const double waterTerm = (meanRain/avgWeeksinMonth)/(weekly_rain+perturbation); //uncomment for weekly
 
-            dxdt[0] = (b*N) - waterTerm*(beta*S*(I+Y)/N) - (mu*S) + (rho*Y) + (epsilon*R);
-            dxdt[1] = (waterTerm*C*beta*S*(I+Y)/N) - (gamma*I) - (mu*I);
-            dxdt[2] = (waterTerm*(1-C)*beta*S*(I+Y)/N) - (rho*Y) - (mu*Y);
-            dxdt[3] = (gamma*I) - (epsilon*R) - (mu*R);
+            dxdt[0] = (b*N) - (waterTerm*theta*S) - (mu*S) + (rho_A*RA) + (rho_S*RS);
+            dxdt[1] = (waterTerm*theta*S) - (gamma_A*I) - (gamma_S*I) - (choleraDeath*I) - (mu*I);
+            dxdt[2] = (gamma_A*I)- (rho_A*RA) - (mu*RA);
+            dxdt[3] = (gamma_S*I) - (rho_S*RS) - (mu*RS);
         }
 
 };
