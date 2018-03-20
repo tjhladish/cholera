@@ -1,0 +1,26 @@
+{
+	"smc_iterations" : 10,
+	"num_samples" 	 : 1000,
+	"predictive_prior_fraction" : 0.1,
+    "pls_training_fraction"     : 0.5,
+
+    "executable"                    : "./cholera",
+    "database_filename"             : "cholera_LL_metric_mean_med_inf.sqlite",
+
+    "parameters" : [
+        {"name"       : "theta",
+         "short_name" : "theta",
+         "dist_type"  : "UNIFORM",
+         "num_type"   : "FLOAT",
+         "par1"       : 0,
+         "par2"       : 1000}
+    ],  
+    "metrics" : [     
+        {"name"       : "mean_inf",
+         "num_type"   : "FLOAT",
+         "value"      : 3},
+        {"name"       : "med_inf",
+         "num_type"   : "FLOAT",
+         "value"      : 2}
+    ]
+}
