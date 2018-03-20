@@ -23,11 +23,11 @@ int main() {
     
 #ifdef USE_LL
 
-        const double theta      = 1.0/239.78;
-        const double gamma_A    = 30.0/.5;//asymptomatic recovery rate
+        const double theta      = 0.0014805;
+        const double gamma_A    = 30.0/1;//asymptomatic recovery rate
         const double gamma_S    = 30.0/14; //symptomatic recovery rate
-        const double rho_A      = (1.0/3)*(1.0/12); //asympomatic waning rate
-        const double rho_S      = (1.0/10)*(1.0/12); //symptomatic waning rate
+        const double rho_A      = 30.0/102.2; //asympomatic waning rate
+        const double rho_S      = 30.0/583; //symptomatic waning rate
     
         recoveryRate = gamma_S;
     
