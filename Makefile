@@ -10,8 +10,11 @@ GSL_LIB = -lm -L$(GSL_PATH)/lib/ -lgsl -lgslcblas -lpthread -ldl
 INCLUDE = -I$(ABCDIR) -I$(GSL_PATH)/include/
 default: cholera
 
-cholera: main.cpp DiffEq_Sim.h Cholera_Sim.h
-	g++ $(FLAGS) $(INCLUDE) -I$(SQLDIR) main.cpp -o cholera $(ABC_LIB) $(GSL_LIB)
+model_king: main.cpp DiffEq_Sim.h Cholera_Sim.h
+	g++ $(FLAGS) $(INCLUDE) main.cpp -DUSE_KING -o model_king $(GSL_LIB)
+
+model_LL: main.cpp DiffEq_Sim.h Cholera_Sim_LL.h
+	g++ $(FLAGS) $(INCLUDE) main.cpp —DUSE_LL -o model_LL $(GSL_LIB)
 
 current_version: main_EventDrivenIBM.cpp EventDriven_Sim_Teunis_waning.hpp EventDriven_parameters.hpp | $(output_dir)/polio_data
 	g++ $(FLAGS) main_EventDrivenIBM.cpp -o polio
